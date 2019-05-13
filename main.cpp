@@ -1,6 +1,6 @@
 #include <iostream>
+#include "density.h"
 
-int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+int main(int argc, char *argv[]) {
+    return gmx::TrajectoryAnalysisCommandLineRunner::runAsMain<density>(argc, argv);
 }

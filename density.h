@@ -34,8 +34,23 @@ private:
 
     // File names for output control
 
-    // This file has two columns, first is density while second is probability
+    // This file prints the histogram for density.
+    // This file cut the simulation box into several pieces.
     std::string fnHistogram_;
+
+    //// These parameters are for use of maximum/minimum density.
+
+    // These file print the maximum / minimum density within spheres of radius defined by probeRadius_;
+    std::string fnMaxMinDensity_;
+
+    double probeRadius_;
+    int probeMesh_;
+
+    AnalysisNeighborhood nb_;
+
+    AnalysisData dataMaxMinDensity_;
+
+    //// End of parameters for use of maximum/minimum density.
 
     // Minimum and maximum density and step values for histogram
     double hist_min_density_;
@@ -43,13 +58,18 @@ private:
     double hist_step_density_;
 
     // Mesh density in each direction
-    double mesh_number_;
+    int mesh_number_;
 
     Selection sel_;
 
     AnalysisData dataHistogram_;
 
-    AnalysisDataAverageModulePointer avegHistogram_;
+    AnalysisDataAverageModulePointer avemHistogram_;
+
+    unsigned massCount_[10000];
+    int densityCount_[10000];
+
+    //AnalysisDataAverageModulePointer avegHistogram_;
 
     t_topology *top_;
     t_atoms atoms_;
