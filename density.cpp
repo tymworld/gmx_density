@@ -246,6 +246,7 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
                         max_density = density_temp > max_density ? density_temp : max_density;
                         min_density = density_temp < min_density ? density_temp : min_density;
                     }
+                    //cout << density_temp << endl;
 
                 }
             }
