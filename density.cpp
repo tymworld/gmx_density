@@ -223,9 +223,11 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
         AnalysisNeighborhoodSearch nbsearch = nb_.initSearch(pbc, sel);
 
         int maxmin_point_number = (int)floor(pow(probeMesh_, 3) * percentage_maxmin_);
+        /*
         vector<double> max_vector;
         vector<double> min_vector;
-
+        */
+        vector<float> density_vector;
 
         for(int x_index = 0; x_index < probeMesh_; x_index++)
         {
@@ -247,6 +249,7 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
                     }
 
                     density_temp = (real)(mass_temp / (4.0/3 * M_PI * pow(probeRadius_,3) ) * 10 / 6.02);
+                    /*
 
                     if(max_vector.size() < maxmin_point_number)
                     {
@@ -276,6 +279,11 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
                         }
                     }
 
+                    */
+
+                    density_vector.insert(density_vector.end(), density_temp);
+
+
                     /*
 
 
@@ -294,10 +302,25 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
                 }
             }
         }
-        cout << "HAHA" << endl;
+        //cout << "HAHA" << endl;
+        /*
 
         max_density = accumulate(begin(max_vector), end(max_vector), 0.0) / max_vector.size();
         min_density = accumulate(begin(min_vector), end(min_vector), 0.0) / min_vector.size();
+        */ 
+        sort(density_vector.begin(), density_vector.end());
+
+        long double min_density_sum = 0.0;
+        long double max_density_sum = 0.0;
+
+        for(int i = 0; i < maxmin_point_number; i++)
+        {
+            min_density_sum += density_vector[i];
+            max_density_sum += density_vector[pow(probeMesh_, 3) - 1 - i];
+        }
+
+        min_density = min_density_sum / maxmin_point_number;
+        max_density = max_density_sum / maxmin_point_number;
 
         dhMaxMin.setPoint(0, max_density);
         dhMaxMin.setPoint(1, min_density);
