@@ -45,6 +45,7 @@ private:
 
     double probeRadius_;
     int probeMesh_;
+    double percentage_maxmin_;
 
     AnalysisNeighborhood nb_;
 

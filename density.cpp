@@ -10,6 +10,8 @@
 #include <gromacs/pbcutil/pbc.h>
 #include <gromacs/pbcutil/rmpbc.h>
 #include <gromacs/selection/nbsearch.h>
+#include <vector>
+#include <numeric>
 
 using namespace std;
 using namespace gmx;
@@ -56,6 +58,10 @@ void density::initOptions(IOptionsContainer *options, TrajectoryAnalysisSettings
     options->addOption(DoubleOption("rprobe").store(&probeRadius_)
                                .defaultValue(2.0)
                                .description("Radius of density probes for max/min density (nm)"));
+
+    options->addOption(DoubleOption("percentage-max-min").store(&percentage_maxmin_)
+                               .defaultValue(0.1)
+                               .description("Percentage of the largest/smallest density values to calculate max/min value"));
 
     options->addOption(IntegerOption("probemesh").store(&probeMesh_)
                                .defaultValue(100)
@@ -216,6 +222,11 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
         dhMaxMin.startFrame(frnr, fr.time);
         AnalysisNeighborhoodSearch nbsearch = nb_.initSearch(pbc, sel);
 
+        int maxmin_point_number = (int)floor(pow(probeMesh_, 3) * percentage_maxmin_);
+        vector<double> max_vector;
+        vector<double> min_vector;
+
+
         for(int x_index = 0; x_index < probeMesh_; x_index++)
         {
             for(int y_index = 0; y_index < probeMesh_; y_index++)
@@ -237,6 +248,37 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
 
                     density_temp = (real)(mass_temp / (4.0/3 * M_PI * pow(probeRadius_,3) ) * 10 / 6.02);
 
+                    if(max_vector.size() < maxmin_point_number)
+                    {
+                        max_vector.insert(max_vector.end(), tempMass);
+                        sort(max_vector.begin(), max_vector.end());
+                    } else
+                    {
+                        if(tempMass > max_vector[0])
+                        {
+                            max_vector.erase(max_vector.begin());
+                            max_vector.insert(max_vector.begin(), tempMass);
+                            sort(max_vector.begin(), max_vector.end());
+                        }
+                    }
+
+                    if(min_vector.size() < maxmin_point_number)
+                    {
+                        min_vector.insert(min_vector.end(), tempMass);
+                        sort(min_vector.begin(), min_vector.end());
+                    } else
+                    {
+                        if(tempMass < min_vector[maxmin_point_number - 1])
+                        {
+                            min_vector.erase(min_vector.end());
+                            min_vector.insert(min_vector.begin(), tempMass);
+                            sort(min_vector.begin(), min_vector.end());
+                        }
+                    }
+
+                    /*
+
+
                     if(x_index == 0 && y_index == 0 && z_index == 0)
                     {
                         max_density = density_temp;
@@ -247,10 +289,14 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
                         min_density = density_temp < min_density ? density_temp : min_density;
                     }
                     //cout << density_temp << endl;
+                    */
 
                 }
             }
         }
+
+        max_density = accumulate(max_vector.begin(), max_vector.end(), 0.0) / max_vector.size();
+        min_density = accumulate(min_vector.begin(), min_vector.end(), 0.0) / min_vector.size();
 
         dhMaxMin.setPoint(0, max_density);
         dhMaxMin.setPoint(1, min_density);
