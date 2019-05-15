@@ -270,7 +270,7 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
                     {
                         if(density_temp < min_vector[maxmin_point_number - 1])
                         {
-                            min_vector.erase(min_vector.end());
+                            min_vector.pop_back();
                             min_vector.insert(min_vector.begin(), density_temp);
                             sort(min_vector.begin(), min_vector.end());
                         }
@@ -294,6 +294,7 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
                 }
             }
         }
+        cout << "HAHA" << endl;
 
         max_density = accumulate(begin(max_vector), end(max_vector), 0.0) / max_vector.size();
         min_density = accumulate(begin(min_vector), end(min_vector), 0.0) / min_vector.size();
