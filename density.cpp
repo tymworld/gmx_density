@@ -250,28 +250,28 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
 
                     if(max_vector.size() < maxmin_point_number)
                     {
-                        max_vector.insert(max_vector.end(), tempMass);
+                        max_vector.insert(max_vector.end(), density_temp);
                         sort(max_vector.begin(), max_vector.end());
                     } else
                     {
-                        if(tempMass > max_vector[0])
+                        if(density_temp > max_vector[0])
                         {
                             max_vector.erase(max_vector.begin());
-                            max_vector.insert(max_vector.begin(), tempMass);
+                            max_vector.insert(max_vector.begin(), density_temp);
                             sort(max_vector.begin(), max_vector.end());
                         }
                     }
 
                     if(min_vector.size() < maxmin_point_number)
                     {
-                        min_vector.insert(min_vector.end(), tempMass);
+                        min_vector.insert(min_vector.end(), density_temp);
                         sort(min_vector.begin(), min_vector.end());
                     } else
                     {
-                        if(tempMass < min_vector[maxmin_point_number - 1])
+                        if(density_temp < min_vector[maxmin_point_number - 1])
                         {
                             min_vector.erase(min_vector.end());
-                            min_vector.insert(min_vector.begin(), tempMass);
+                            min_vector.insert(min_vector.begin(), density_temp);
                             sort(min_vector.begin(), min_vector.end());
                         }
                     }
