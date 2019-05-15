@@ -40,6 +40,8 @@ private:
 
     //// These parameters are for use of maximum/minimum density.
 
+    std::string fnRawDensity_;
+
     // These file print the maximum / minimum density within spheres of radius defined by probeRadius_;
     std::string fnMaxMinDensity_;
 

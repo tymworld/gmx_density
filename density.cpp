@@ -4,6 +4,7 @@
 
 #include "density.h"
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <gromacs/trajectoryanalysis.h>
 #include <gromacs/fileio/pdbio.h>
@@ -12,6 +13,7 @@
 #include <gromacs/selection/nbsearch.h>
 #include <vector>
 #include <numeric>
+#include <cstdlib>
 
 using namespace std;
 using namespace gmx;
@@ -42,6 +44,11 @@ void density::initOptions(IOptionsContainer *options, TrajectoryAnalysisSettings
                                .filetype(eftPlot).outputFile()
                                .store(&fnMaxMinDensity_).defaultBasename("maxmin_density")
                                .description("Maximum/Minimum density"));
+
+    options->addOption(FileNameOption("raw-density")
+                               .filetype(eftGenericData).outputFile()
+                               .store(&fnRawDensity_).defaultBasename("raw_density")
+                               .description("Raw density (mesh^3 per frame, all in one file without frame seperater.)"));
 
     options->addOption(DoubleOption("histmin").store(&hist_min_density_)
                                .defaultValue(0.0)
@@ -110,6 +117,13 @@ void density::initAnalysis(const TrajectoryAnalysisSettings &settings, const Top
 
         dataMaxMinDensity_.addModule(plotMaxMin);
 
+        nb_.setCutoff(probeRadius_);
+
+    }
+
+    if(!fnRawDensity_.empty())
+    {
+        dataMaxMinDensity_.setColumnCount(0, 2);
         nb_.setCutoff(probeRadius_);
 
     }
@@ -207,7 +221,7 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
 
 
 
-    if(!fnMaxMinDensity_.empty())
+    if(!fnMaxMinDensity_.empty() or !fnRawDensity_.empty())
     {
 
 
@@ -309,6 +323,15 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
         min_density = accumulate(begin(min_vector), end(min_vector), 0.0) / min_vector.size();
         */ 
         sort(density_vector.begin(), density_vector.end());
+
+        if(!fnRawDensity_.empty())
+        {
+
+            std::ofstream output_file(fnRawDensity_);
+            std::ostream_iterator<float> output_iterator(output_file, "\n");
+            std::copy(density_vector.begin(), density_vector.end(), output_iterator);
+            output_file.close();
+        }
 
         long double min_density_sum = 0.0;
         long double max_density_sum = 0.0;
