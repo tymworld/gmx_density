@@ -295,8 +295,8 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
             }
         }
 
-        max_density = accumulate(max_vector.begin(), max_vector.end(), 0.0) / max_vector.size();
-        min_density = accumulate(min_vector.begin(), min_vector.end(), 0.0) / min_vector.size();
+        max_density = accumulate(begin(max_vector), end(max_vector), 0.0) / max_vector.size();
+        min_density = accumulate(begin(min_vector), end(min_vector), 0.0) / min_vector.size();
 
         dhMaxMin.setPoint(0, max_density);
         dhMaxMin.setPoint(1, min_density);
