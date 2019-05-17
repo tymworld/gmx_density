@@ -327,7 +327,7 @@ void density::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajector
         if(!fnRawDensity_.empty())
         {
 
-            std::ofstream output_file(fnRawDensity_);
+            std::ofstream output_file(fnRawDensity_, ios_base::out|ios_base::app);
             std::ostream_iterator<float> output_iterator(output_file, "\n");
             std::copy(density_vector.begin(), density_vector.end(), output_iterator);
             output_file.close();
